@@ -2,11 +2,8 @@
 
 Publish your org documents to a personally hosted web-based notebook. The notebook presents all note entries in a chronological index, where each entry can be maximized and minimized without opening a new page. Entries in the index can be filtered by tag and date.
 
-[[file:demos/screenshot_1.PNG]]
+#+caption: Notebook webpage rendering
 [[file:demos/screenshot_2.PNG]]
-[[file:demos/screenshot_3.PNG]]
-[[file:demos/screenshot_4.PNG]]
-[[file:demos/demo_1.mp4]]
 
 * Prerequisites
 - A webserver with PHP 8+ and the PHP YAML extension OR a server with docker (A dockerfile and compose.yml are provided in ./published and can be modified from =setup.org=)
@@ -96,3 +93,10 @@ Builds a summary of the note entries on the current endpoint. The format is
 The inner-text value of the classes specified under the =metadata= key in the backend configuration will be included in the summary. The inner-text values of all nested tags <tag> under a class will be included in a list if =group: <tag>= is specified for a particular class.
 ** fetch
 Fetches the note entry file on the URL supplied to =path=, =<endpoint>/fetch/?path=<url>=, where the URL is given relative to =index.html=. Any links that include directories specified under the =media= key in the backend configuration will be modified such that they are relative to =index.html= in the delivered HTML.
+* Screenshots
+
+[[file:demos/screenshot_1.PNG]]
+
+[[file:demos/screenshot_3.PNG]]
+
+[[file:demos/screenshot_4.PNG]]
