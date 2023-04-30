@@ -1,0 +1,20 @@
+server:
+  - endpoint_name: notes
+    path: notes/notes/
+    media:
+      - media/
+    metadata:
+      - classname: title
+      - classname: date
+      - classname: tags
+        group: li
+  - endpoint_name: projects
+    path: projects/projects/
+    media:
+      - media/
+    metadata:
+      - classname: title
+      - classname: date
+      - classname: abstract
+      - classname: tags
+        group: li

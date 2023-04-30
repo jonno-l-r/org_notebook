@@ -1,0 +1,180 @@
+#+title: Notebook Renderer Configuration
+
+To set up the publishing functions and capture template, evaluate all codeblocks in this document (=C-c C-v b= --- /read all executable source blocks carefully before executing to ensure you don't break your existing setup/). The evaluation of non-elisp codeblocks has been disabled. If changes are made to the server, docker or frontend configuration blocks, they will need to be tangled to ./published. Launch tangling with =C-c C-v f=.
+
+To have this file loaded automatically, add =(org-babel-load-file (expand-file-name <path-to-this-file>))= to your =.emacs.el=
+
+* Org capture
+#+NAME: set-capture-template
+#+BEGIN_SRC elisp :var rt=routine :var notes-root=(file-name-directory buffer-file-name)
+  (setq notes-path (expand-file-name
+                    (concat notes-root "source/notebook_a/notebook_a/")))
+
+
+  ;; Make new note file and add headline to index
+  (defun new-note (path)
+    (let* ((name (read-string "name: ")))
+      (expand-file-name (format "%s_%s.org"
+                                (format-time-string "%Y-%m-%d")
+                                name)
+                        path)))
+
+
+  ;; Capture templates
+  (setq org-capture-templates
+        `(("n" "Notebook" plain (file (lambda () (new-note notes-path)))
+           ,(concat "# -*- org-confirm-babel-evaluate: nil -*-\n"
+                    "#+FILETAGS: %^G\n"
+                    "%[" notes-root "source/shared/org/template.org]\n"
+                    "#+DATE: %U\n"
+                    "#+TITLE: %^{Note title}\n %?"))))
+
+  (add-hook 'org-capture-mode-hook #'org-align-all-tags)
+
+
+  ;; Bind capture dispatcher to C-x a c
+  (global-set-key (kbd "C-x a c") 'org-capture)
+
+
+  notes-path
+#+END_SRC
+
+#+RESULTS: set-capture-template
+: /home/jon/docs/notes/source/journal/journal.org
+* Org Publish
+#+name: org-publish
+#+begin_src emacs-lisp :var base-dir=(concat (file-name-directory buffer-file-name) :results none
+  (require 'ox-publish)
+
+  (setq org-publish-project-alist
+        `(("notebook"
+           :base-directory ,(concat base-dir "source/notebook_a/")
+           :base-extension "org"
+           :publishing-directory ,(concat base-dir "published/web/notebook_a/")
+           :recursive t
+           :publishing-function org-html-publish-to-html
+           :auto-index nil)
+
+          ("notebook-static"
+           :base-directory ,(concat base-dir "source/notebook_a/")
+           :base-extension "css\\|png\\|jpg\\|gif\\|pdf\\|svg"
+           :publishing-directory ,(concat base-dir "published/web/notebook_a/")
+           :recursive t
+           :publishing-function org-publish-attachment)
+
+          ("shared"
+           :base-directory ,(concat base-dir "source/shared/")
+           :base-extension "css\\|png\\|jpg\\|gif\\|pdf\\|svg"
+           :publishing-directory ,(concat base-dir "published/web/shared/")
+           :recursive t
+           :publishing-function org-publish-attachment)
+
+          ("Notebook" :components ("notebook" "notebook-static" "shared"))
+#+end_src
+
+* Misc Org Configuration
+** Manage file extensions of babel codeblocks that generate media
+#+BEGIN_SRC emacs-lisp :results none
+  ;; Use this function to generate filename
+  ;; extensions on the fly during publishing.
+  ;; Useful for babel codeblocks that generate
+  ;; images to be included in the document
+  (defun cond-exp (file-name)
+    (if (org-export-derived-backend-p org-export-current-backend 'latex)
+        (concat file-name ".pdf")
+      (concat file-name ".png")))
+#+END_SRC
+
+Example usage of =cond-export=. The filename returned to the buffer under =#+RESULTS= is generated during publishing. For HTML exports, the extension will be =.png=, and for latex exports it will be =.pdf=
+#+begin_example
+#+HEADER: :imagemagick yes
+#+begin_src latex :file (cond-exp "my-figure") :results file raw :exports results
+  
+#+end_src
+
+#+CAPTION: caption
+#+LABEL: fig:label
+#+RESULTS:
+[[file:my-figure]]
+#+end_example
+
+* Server configuration
+** API setup
+#+server-config
+#+begin_src yaml :tangle published/web/src/conf/config.yml :eval never
+  server:
+    - endpoint_name: notebook_a
+      path: notebook_a/notebook_a/
+      media:
+        - media/
+      metadata:
+        - classname: title
+        - classname: date
+        - classname: tags
+          group: li
+    - endpoint_name: notebook_b
+      path: notebook_b/notebook_b/
+      media:
+        - media/
+      metadata:
+        - classname: title
+        - classname: date
+        - classname: abstract
+        - classname: tags
+          group: li
+#+end_src
+
+** Docker
+#+name: dockerfile
+#+begin_src sh :tangle published/published.Dockerfile :eval never
+    FROM php:8.2-apache
+
+    RUN apt-get update && apt-get install -y libyaml-dev
+
+    # PECL update
+    RUN pecl channel-update pecl.php.net
+
+    # Ext yaml
+    RUN pecl install yaml && docker-php-ext-enable yaml
+
+    EXPOSE 80
+#+end_src
+
+#+name: compose
+#+begin_src yaml :tangle published/compose.yml :eval never
+  networks:
+    public:
+      external:
+        name: frontend
+  services:
+    published:
+      build:
+        context: ./
+        dockerfile: "published.Dockerfile"
+      restart: always
+      volumes:
+        - type: bind
+          source: ./web
+          target: /var/www/html
+        - type: bind
+          source: ./log
+          target: /var/log/apache2
+      environment:
+        - TZ=Australia/Canberra
+      networks:
+        - public
+#+end_src
+
+* Frontend configuration
+#+name: frontend-configuration
+#+begin_src js :tangle published/web/src/js/launch.js :eval never
+  (() => {
+      main({
+          "endpoints": [
+              "notebook_a",
+              "notebook_b"
+          ]
+      });
+  })();
+#+end_src
+

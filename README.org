@@ -1,0 +1,98 @@
+#+title: Org Notebook Publisher
+
+Publish your org documents to a personally hosted web-based notebook. The notebook presents all note entries in a chronological index, where each entry can be maximized and minimized without opening a new page. Entries in the index can be filtered by tag and date.
+
+[[file:demos/screenshot_1.PNG]]
+[[file:demos/screenshot_2.PNG]]
+[[file:demos/screenshot_3.PNG]]
+[[file:demos/screenshot_4.PNG]]
+[[file:demos/demo_1.mp4]]
+
+* Prerequisites
+- A webserver with PHP 8+ and the PHP YAML extension OR a server with docker (A dockerfile and compose.yml are provided in ./published and can be modified from =setup.org=)
+- Emacs 28 with Orgmode 9.5 (other versions might work but have not been tested)
+* Workflow: Adding a New Note
+1. Launch the Org capture dispatcher =C-x a c=.
+2. Select N to start a new note. Answer the minibuffer prompts to
+   1. Enter the filename. Note that the actual filename will be prepended with a timestamp
+   2. Enter the tags to attach to the note entry. Multiple tags can be delimited by a colon
+      =tag1:tag2:tag3=
+   3. Enter the note title
+3. A capture buffer will appear with the required frontmatter prepended. Add the document body below the title. Do note delete the frontmatter.
+      #+begin_example
+# -*- org-confirm-babel-evaluate: nil -*-
+#+FILETAGS: :test:test1:test2:
+#+html_head: <link rel="stylesheet" type="text/css" href="../../shared/css/article.css"/>
+#+options: h:4 num:t toc:t
+#+author: your name
+#+email: you@youremail.com
+
+#+begin_src emacs-lisp :results list :wrap tags :exports results
+  org-file-tags
+#+end_src
+
+
+#+DATE: [2023-04-30 Sun 18:57]
+#+TITLE: Hello, World!
+
+Now fill out the document body   
+   #+end_example
+4. Commit capture buffer contents to file with =C-c C-c=. The document can be retrieved for future editing from =./source/notebook_a/notebook_a/<timestamp>_your-note.org=
+5. When ready to publish, launch the Org publish dispatcher with =M-x org-publish=, then type =Notebook= at the minibuffer prompt and press enter. The HTML output will be generated on ../published/web/notebook_a/notebook_a
+6. Copy the ./published directory to your webserver
+7. Access the published notebook from <your-webserver>/published/web/index.html
+
+Note that
+- All media referenced in the document markup must be kept in =../notebook_a/media=
+- The notebook backend expects tags to be present by default. This can be changed in the configuration
+- Org capture, Org publish, server backend and webpage frontend configuration can all be modified from =setup.org= (see the following sections). Tangle the file and push ./published to your webserver for any changes to take effect.
+- The instructions given above refer to the default notebook =notebook_a=. This can be changed in the configuration as explained below.
+
+* Setup and configuration
+** Orgmode
+To change the notebook used in the capture template, modify the notes-path variable in the =set-capture-template= codeblock. Note that notebook entries must be filed to =./<notebook-name/<notebook-name>=. These directories should be present in the filesystem
+
+To change the notebook to be published, edit the =org-publish-project-alist= defined in the =org-publish= codeblock. Edit the =base-directory= and =publishing-directory= properties. Multiple notebooks can be published by adding new  =notebook= and =notebook-static= lists (but under different names) to =org-publish-project-alist=. Note that additional notebooks will need to be added to the =:components= property (or broken out into a new =:components= property under a different name)
+** Server
+The PHP backend can be configured through a yaml file (see the =server-config= source block). Published notebooks can be mapped to a particular endpoint name, and the metadata to parse can be specified under the metadata key. The path to the HTML note entries is specified under =path=, which is given relative to =./published/web/= (i.e. for a notebook project =./source/notebook_a/notebook_a=, =path= is =notebook_a/notebook_a/=
+
+metadata is specified in terms of HTML classes. I.e. the date and title metadata is located in the HTML markup elements with =title= and =date= classes, respecitvely. Tags are held under a custom =tags= class. The backend extracts the inner-text of these elements. The inner text of groups of tags under a class can be extracted as a list by specifying =group: <tagname>= under the desired class. This mechanism is used to extract the tag values from the note entry, which are held in an HTML list under a div of class =tag=
+
+** Frontend
+The frontend needs to be made aware of the endpoints defined in the backend configuraiton. The endpoints are held in =src/js/launch.js=, which can be edited from the =frontend-configuration= source block in =setup.org=. Add the desired endpoint names to the list under the =endpoints= key of the object passed into =main=.
+* API
+The addressing scheme is =<server>/published/src/php/main.php/<endpoint>/<command>=
+
+Valid commands are
+- buildindex
+- fetch
+
+Valid endpoints are any endpoint defined in the backend configuration file.
+
+** buildindex
+Builds a summary of the note entries on the current endpoint. The format is
+
+#+begin_src js
+  {
+      "index": [
+          {
+              "endpoint": "endpoint-name",
+              "url": "url/relative/to/index.html",
+              "title": "note-title",
+              "date": "note-timestamp",
+              "tags": [
+                  "tag1", "tag2", "etc."
+              ]
+          },
+          ...
+      ],
+      "tags": {
+          "tag1": <occurrences>,
+          "tag2": <occurrences>
+      }
+  }
+#+end_src
+
+The inner-text value of the classes specified under the =metadata= key in the backend configuration will be included in the summary. The inner-text values of all nested tags <tag> under a class will be included in a list if =group: <tag>= is specified for a particular class.
+** fetch
+Fetches the note entry file on the URL supplied to =path=, =<endpoint>/fetch/?path=<url>=, where the URL is given relative to =index.html=. Any links that include directories specified under the =media= key in the backend configuration will be modified such that they are relative to =index.html= in the delivered HTML.
