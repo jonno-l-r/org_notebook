@@ -1,0 +1,63 @@
+# -*- org-confirm-babel-evaluate: nil -*-
+#+FILETAGS: :hello:world:
+#+html_head: <link rel="stylesheet" type="text/css" href="../../shared/css/article.css"/>
+#+options: h:4 num:t toc:t
+#+author: your name
+#+email: you@youremail.com
+
+#+begin_src emacs-lisp :results list :wrap tags :exports results
+  org-file-tags
+#+end_src
+
+
+#+DATE: [2023-05-01 Mon 08:22]
+#+TITLE: Hello Again, World!
+
+* Hello Again
+Here is a table
+#+caption: $y(x) = x^2$
+#+name: data
+|  x | y |
+|----+---|
+| -2 | 4 |
+| -1 | 1 |
+|  0 | 0 |
+|  1 | 1 |
+|  2 | 4 |
+|  3 | 9 |
+
+And here is some python that plots the tabulated data.
+
+#+caption: Python to plot data in table [[data]]
+#+begin_src python +n :results file :exports both :var name="../media/table.png" :var table=data
+  import matplotlib.pyplot as plt
+
+  fig = plt.figure(
+      figsize = (8,5)
+  )
+
+  get_column = lambda i: list(
+      map(
+          lambda e: int(e[i]),
+          table
+      )
+  )
+
+  plt.plot(
+      get_column(0),
+      get_column(1),
+      "o",
+      label = "tabulated data"
+  )
+
+  plt.grid()
+  plt.legend(loc = "upper right")
+  plt.savefig(name, transparent=True)
+
+  return name
+#+end_src
+
+#+caption: Plot of data tabulated in [[data]]
+#+RESULTS:
+[[file:../media/table.png]]
+

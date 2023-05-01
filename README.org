@@ -24,9 +24,9 @@ Publish your org documents to a personally hosted web-based notebook. The notebo
 #+author: your name
 #+email: you@youremail.com
 
-#+begin_src emacs-lisp :results list :wrap tags :exports results
+,#+begin_src emacs-lisp :results list :wrap tags :exports results
   org-file-tags
-#+end_src
+,#+end_src
 
 
 #+DATE: [2023-04-30 Sun 18:57]
@@ -51,12 +51,42 @@ To change the notebook used in the capture template, modify the notes-path varia
 
 To change the notebook to be published, edit the =org-publish-project-alist= defined in the =org-publish= codeblock. Edit the =base-directory= and =publishing-directory= properties. Multiple notebooks can be published by adding new  =notebook= and =notebook-static= lists (but under different names) to =org-publish-project-alist=. Note that additional notebooks will need to be added to the =:components= property (or broken out into a new =:components= property under a different name)
 ** Server
-The PHP backend can be configured through a yaml file (see the =server-config= source block). Published notebooks can be mapped to a particular endpoint name, and the metadata to parse can be specified under the metadata key. The path to the HTML note entries is specified under =path=, which is given relative to =./published/web/= (i.e. for a notebook project =./source/notebook_a/notebook_a=, =path= is =notebook_a/notebook_a/=
+Backend configuration can be set through a yaml configuration file (see the =server-config= source block). The configuration file is used to map a particular notebook to an API endpoint, along with the metadata to parse for each notebook. Note that currently only title, date and custom tag and abstract metadata classes are parsed.
 
-metadata is specified in terms of HTML classes. I.e. the date and title metadata is located in the HTML markup elements with =title= and =date= classes, respecitvely. Tags are held under a custom =tags= class. The backend extracts the inner-text of these elements. The inner text of groups of tags under a class can be extracted as a list by specifying =group: <tagname>= under the desired class. This mechanism is used to extract the tag values from the note entry, which are held in an HTML list under a div of class =tag=
+#+caption: Example server configuration file
+#+begin_src yaml :eval never
+  server:
+    - endpoint_name: notebook_a
+      path: notebook_a/notebook_a/
+      media:
+        - media/
+      metadata:
+        - classname: title
+        - classname: date
+        - classname: tags
+          group: li  
+#+end_src
+
+Tags are held as list items in a div of class 'tags' in the HTML. If =group: <tagname>=' is set for a particular class, the API will return the inner text of each <tag> in the class as a list.
+
+Note that the title, data and tag classes need to be set under metadata (as shown above) for the frontend to function.
 
 ** Frontend
-The frontend needs to be made aware of the endpoints defined in the backend configuraiton. The endpoints are held in =src/js/launch.js=, which can be edited from the =frontend-configuration= source block in =setup.org=. Add the desired endpoint names to the list under the =endpoints= key of the object passed into =main=.
+Notebooks to render in the frontend can be set in =src/js/launch.js=, which can be edited from the =frontend-configuration= source block in =setup.org=. Add the desired endpoint names to the list under the =endpoints= key of the object passed into =main= (as shown below).
+
+#+caption: Frontend configuration
+#+begin_src js :eval never
+  (() => {
+      main({
+          "endpoints": [
+              "notebook_a"
+          ]
+      });
+  })();
+#+end_src
+
+See the full setup file =setup.org= for more information.
+
 * API
 The addressing scheme is =<server>/published/src/php/main.php/<endpoint>/<command>=
 
@@ -90,7 +120,7 @@ Builds a summary of the note entries on the current endpoint. The format is
   }
 #+end_src
 
-The inner-text value of the classes specified under the =metadata= key in the backend configuration will be included in the summary. The inner-text values of all nested tags <tag> under a class will be included in a list if =group: <tag>= is specified for a particular class.
+The inner-text value of the classes specified under the =metadata= key in the backend configuration will be included in the summary. 
 ** fetch
 Fetches the note entry file on the URL supplied to =path=, =<endpoint>/fetch/?path=<url>=, where the URL is given relative to =index.html=. Any links that include directories specified under the =media= key in the backend configuration will be modified such that they are relative to =index.html= in the delivered HTML.
 * Screenshots

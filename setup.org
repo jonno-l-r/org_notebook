@@ -6,7 +6,7 @@ To have this file loaded automatically, add =(org-babel-load-file (expand-file-n
 
 * Org capture
 #+NAME: set-capture-template
-#+BEGIN_SRC elisp :var rt=routine :var notes-root=(file-name-directory buffer-file-name)
+#+BEGIN_SRC elisp :var notes-root=(file-name-directory buffer-file-name)
   (setq notes-path (expand-file-name
                     (concat notes-root "source/notebook_a/notebook_a/")))
 
@@ -39,8 +39,6 @@ To have this file loaded automatically, add =(org-babel-load-file (expand-file-n
   notes-path
 #+END_SRC
 
-#+RESULTS: set-capture-template
-: /home/jon/docs/notes/source/journal/journal.org
 * Org Publish
 #+name: org-publish
 #+begin_src emacs-lisp :var base-dir=(concat (file-name-directory buffer-file-name) :results none
@@ -69,7 +67,7 @@ To have this file loaded automatically, add =(org-babel-load-file (expand-file-n
            :recursive t
            :publishing-function org-publish-attachment)
 
-          ("Notebook" :components ("notebook" "notebook-static" "shared"))
+          ("Notebook" :components ("notebook" "notebook-static" "shared"))))
 #+end_src
 
 * Misc Org Configuration
@@ -88,9 +86,9 @@ To have this file loaded automatically, add =(org-babel-load-file (expand-file-n
 Example usage of =cond-export=. The filename returned to the buffer under =#+RESULTS= is generated during publishing. For HTML exports, the extension will be =.png=, and for latex exports it will be =.pdf=
 #+begin_example
 #+HEADER: :imagemagick yes
-#+begin_src latex :file (cond-exp "my-figure") :results file raw :exports results
+,#+begin_src latex :file (cond-exp "my-figure") :results file raw :exports results
   
-#+end_src
+,#+end_src
 
 #+CAPTION: caption
 #+LABEL: fig:label
@@ -119,7 +117,6 @@ Example usage of =cond-export=. The filename returned to the buffer under =#+RES
       metadata:
         - classname: title
         - classname: date
-        - classname: abstract
         - classname: tags
           group: li
 #+end_src
@@ -147,7 +144,7 @@ Example usage of =cond-export=. The filename returned to the buffer under =#+RES
       external:
         name: frontend
   services:
-    published:
+    test:
       build:
         context: ./
         dockerfile: "published.Dockerfile"

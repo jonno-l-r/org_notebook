@@ -1,6 +1,6 @@
 server:
-  - endpoint_name: notes
-    path: notes/notes/
+  - endpoint_name: notebook_a
+    path: notebook_a/notebook_a/
     media:
       - media/
     metadata:
@@ -8,13 +8,12 @@ server:
       - classname: date
       - classname: tags
         group: li
-  - endpoint_name: projects
-    path: projects/projects/
+  - endpoint_name: notebook_b
+    path: notebook_b/notebook_b/
     media:
       - media/
     metadata:
       - classname: title
       - classname: date
-      - classname: abstract
       - classname: tags
         group: li

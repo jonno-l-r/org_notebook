@@ -1,8 +1,8 @@
 (() => {
     main({
         "endpoints": [
-            "notes",
-            "projects"
+            "notebook_a",
+            "notebook_b"
         ]
     });
 })();
