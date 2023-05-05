@@ -90,7 +90,7 @@ The notebook repository is structured as outlined below;
 [[file:demos/orgtree.png]]
 
 Published HTML is saved to =published/web=. The published directory also holds the source files for the API and web frontend.
-#+begin_src plantuml :file demos/publishedtree.png
+#+begin_src plantuml :file demos/publishedtree.png :exports results
   @startditaa
   root
   |
