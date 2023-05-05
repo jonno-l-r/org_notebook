@@ -8,7 +8,7 @@ To have this file loaded automatically, add =(org-babel-load-file (expand-file-n
 #+NAME: set-capture-template
 #+BEGIN_SRC elisp :var notes-root=(file-name-directory buffer-file-name)
   (setq notes-path (expand-file-name
-                    (concat notes-root "source/notebook_a/notebook_a/")))
+                    (concat notes-root "org/notebook_a/notebook_a/")))
 
 
   ;; Make new note file and add headline to index
@@ -25,7 +25,7 @@ To have this file loaded automatically, add =(org-babel-load-file (expand-file-n
         `(("n" "Notebook" plain (file (lambda () (new-note notes-path)))
            ,(concat "# -*- org-confirm-babel-evaluate: nil -*-\n"
                     "#+FILETAGS: %^G\n"
-                    "%[" notes-root "source/shared/org/template.org]\n"
+                    "%[" notes-root "org/shared/org/template.org]\n"
                     "#+DATE: %U\n"
                     "#+TITLE: %^{Note title}\n %?"))))
 
@@ -46,7 +46,7 @@ To have this file loaded automatically, add =(org-babel-load-file (expand-file-n
 
   (setq org-publish-project-alist
         `(("notebook"
-           :base-directory ,(concat base-dir "source/notebook_a/")
+           :base-directory ,(concat base-dir "org/notebook_a/")
            :base-extension "org"
            :publishing-directory ,(concat base-dir "published/web/notebook_a/")
            :recursive t
@@ -54,14 +54,14 @@ To have this file loaded automatically, add =(org-babel-load-file (expand-file-n
            :auto-index nil)
 
           ("notebook-static"
-           :base-directory ,(concat base-dir "source/notebook_a/")
+           :base-directory ,(concat base-dir "org/notebook_a/")
            :base-extension "css\\|png\\|jpg\\|gif\\|pdf\\|svg"
            :publishing-directory ,(concat base-dir "published/web/notebook_a/")
            :recursive t
            :publishing-function org-publish-attachment)
 
           ("shared"
-           :base-directory ,(concat base-dir "source/shared/")
+           :base-directory ,(concat base-dir "org/shared/")
            :base-extension "css\\|png\\|jpg\\|gif\\|pdf\\|svg"
            :publishing-directory ,(concat base-dir "published/web/shared/")
            :recursive t

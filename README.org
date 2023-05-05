@@ -7,7 +7,7 @@ Publish your org documents to a personally hosted web-based notebook. The notebo
 
 * Prerequisites
 - A webserver with PHP 8+ and the PHP YAML extension OR a server with docker (A dockerfile and compose.yml are provided in ./published and can be modified from =setup.org=)
-- Emacs 28 with Orgmode 9.5 (other versions might work but have not been tested)
+- Emacs 28 with Org-mode 9.5 (other versions might work but have not been tested)
 * Workflow: Adding a New Note
 1. Launch the Org capture dispatcher =C-x a c=.
 2. Select N to start a new note. Answer the minibuffer prompts to
@@ -46,10 +46,136 @@ Note that
 - The instructions given above refer to the default notebook =notebook_a=. This can be changed in the configuration as explained below.
 
 * Setup and configuration
-** Orgmode
-To change the notebook used in the capture template, modify the notes-path variable in the =set-capture-template= codeblock. Note that notebook entries must be filed to =./<notebook-name/<notebook-name>=. These directories should be present in the filesystem
+The notebook repository is structured as outlined below;
+#+begin_src plantuml :file demos/orgtree.png :exports results
+  @startditaa
+  root
+  |
+  +---org
+  |   |
+  |   +---shared
+  |   |   |
+  |   |   +---org
+  |   |   |   |
+  |   |   |   +---template.org
+  |   |   |
+  |   |   +---css
+  |   |       |
+  |   |       +---note.css
+  |   |
+  |   +---notebook_1
+  |   |   |
+  |   |   +---notebook_1
+  |   |   |   |
+  |   |   |   +---timestamp_notename.org
+  |   |   |   |
+  |   |   |   v
+  |   |   |               
+  |   |   +---media
+  |   |       |
+  |   |       +---mediafile.png
+  |   |       |
+  |   |       v
+  |   |                     
+  |   +---notebook_2
+  |   |   |
+  |   |   v
+  |   v
+  |
+  +---published
+  @endditaa
+#+end_src
 
-To change the notebook to be published, edit the =org-publish-project-alist= defined in the =org-publish= codeblock. Edit the =base-directory= and =publishing-directory= properties. Multiple notebooks can be published by adding new  =notebook= and =notebook-static= lists (but under different names) to =org-publish-project-alist=. Note that additional notebooks will need to be added to the =:components= property (or broken out into a new =:components= property under a different name)
+#+RESULTS:
+[[file:demos/orgtree.png]]
+
+Published HTML is saved to =published/web=. The published directory also holds the source files for the API and web frontend.
+#+begin_src plantuml :file demos/publishedtree.png
+  @startditaa
+  root
+  |
+  +---org
+  |   |
+  |   v
+  |
+  +---published
+      |
+      +---compose.yml
+      +---published.dockerfile
+      |
+      +---web
+          |
+          +---index.html
+          +---src
+          |   |
+          |   +---js
+          |   |   |
+          |   |   +---launch.js
+          |   |   |
+          |   |   v
+          |   |
+          |   +---php
+          |   |   |
+          |   |   +---main.php
+          |   |   |
+          |   |   v
+          |   |
+          |   +---css
+          |   |   |
+          |   |   v
+          |   |
+          |   +---conf
+          |       |
+          |       +---config.yml
+          |
+          +---shared
+          |   |
+          |   v
+          |
+          +---notebook_1
+          |   |
+          |   v
+          |
+          +---notebook_2
+          |   |
+          |   v
+          v
+  @endditaa
+#+end_src
+
+#+RESULTS:
+[[file:demos/publishedtree.png]]
+
+** Org-mode
+To change the notebook used in the capture template, modify the notes-path variable in the =set-capture-template= codeblock. Note that notebook entries must be filed to =./<notebook-name/<notebook-name>=. These directories should be present in the filesystem before using the org-capture dispatcher for the first time.
+
+To change the notebook to be published, edit the =org-publish-project-alist= defined in the =org-publish= codeblock. Edit the =base-directory= and =publishing-directory= properties. Multiple notebooks can be published by adding new  =notebook= and =notebook-static= lists (but under different names) to =org-publish-project-alist=. Note that additional notebooks will need to be added to the =:components= property (or broken out into a new =:components= property under a different name), i.e.
+
+#+begin_src emacs-lisp :eval never
+  (setq org-publish-project-alist
+        `(("notebook-a"
+           ...)
+
+          ("notebook-a-static"
+           ...)
+
+          ("notebook-b"
+           ...)
+
+          ("notebook-b-static"
+           ...)        
+
+          ("shared"
+           ...)
+
+          ("Notebook-A" :components
+           ("notebook-a" "notebook-a-static" "shared"))
+          ("Notebook-B" :components
+           ("notebook-b" "notebook-b-static" "shared"))))
+#+end_src
+
+See the [[https://orgmode.org/manual/Publishing.html][org publishing]] documentation for more info on the org-mode publishing system
+
 ** Server
 Backend configuration can be set through a yaml configuration file (see the =server-config= source block). The configuration file is used to map a particular notebook to an API endpoint, along with the metadata to parse for each notebook. Note that currently only title, date and custom tag and abstract metadata classes are parsed.
 
