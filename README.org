@@ -265,5 +265,5 @@ Filtered index example:
 
 [[file:demos/screenshot_2.PNG]]
 
-Mobile:
+** Mobile
 [[file:demos/screenshot_4.PNG]]
