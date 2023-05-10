@@ -1,5 +1,5 @@
 /*
- * © 2023 Jon Rabe, jonrabe@jonr.net
+ * 2023 Jon Rabe, jonrabe@jonr.net
  */
 
 

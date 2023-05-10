@@ -1,5 +1,5 @@
 /*
- * © 2023 Jon Rabe, jonrabe@jonr.net
+ * 2023 Jon Rabe, jonrabe@jonr.net
  */
 
 
@@ -16,6 +16,7 @@ function makeOutline(){
     return {
         wrapper: wrapper,
         entries: [],
+
         addEntries: function(outline) {
             for (entry of outline.index){
                 let outline_entry = _makeEntry(entry);
@@ -27,11 +28,13 @@ function makeOutline(){
                 this.entries.push(outline_entry);
             }
         },
+
         sortEntries: function() {
             this.entries.sort(
                 (a,b) => b.timestamp - a.timestamp
             );
         },
+
         pushEntries: function () {
             this.wrapper.replaceChildren(
                 ...this.entries.map(e => e.node)
@@ -42,52 +45,20 @@ function makeOutline(){
 
 
 function _makeEntry(entry){
-    let wrapper = document.createElement("div");
-    wrapper.className = "content-wrapper";
-
-    let title = document.createElement("div");
-    title.className = "title";
-
-    let heading_wrapper = document.createElement("div");
-    heading_wrapper.className = "heading-wrapper";
-
-    let heading = document.createElement("h2");
-    heading.className = "heading";
-    heading.innerText = entry.title;
-
-    let timestamp = _parseDateString(entry.date);
-    let date = document.createElement("div");
-    date.className = "date";
-    date.innerText = timestamp.toDateString();
-
-    let taglist = document.createElement("span");
-    taglist.className = "taglist";
-
-    let filters = {};
-    for (_tag of entry.tags){
-        let tag = document.createElement("span");
-        tag.className = "tag";
-        tag.innerText = _tag;
-        taglist.append(tag);
-        filters[_tag] = true;
-    }
-
-    heading_wrapper.append(heading);
-    heading_wrapper.append(taglist);
-    title.append(date);
-    title.append(heading_wrapper);
-    wrapper.append(title);
+    let wrapper = _makeEntryWrapper(entry),
+        tag_filters = _makeTagWrappers(entry, wrapper);
 
     return {
         node: wrapper,
         tags: entry.tags,
         url: entry.url,
         endpoint:  entry.endpoint,
-        timestamp: timestamp,
+        timestamp: _parseDateString(entry.date),
         bound: false,
         visible: true,
-        tag_filters: filters,
+        tag_filters: tag_filters,
         date_filter: true,
+
         toggle_binding: function(){
             if (this.bound) {
                 let content = this.node.getElementsByClassName("content")[0];
@@ -99,6 +70,7 @@ function _makeEntry(entry){
                 this.bound = true;
             }
         },
+
         filter: function(mode){
             let _filter = (mode=="&") ?
                 (a, b)=>a && b :
@@ -123,6 +95,53 @@ function _makeEntry(entry){
 }
 
 
+function _makeTagWrappers(entry, wrapper){
+    let filters = {};
+
+    for (_tag of entry.tags){
+        let tag = document.createElement("span"),
+            taglist = wrapper.getElementsByClassName("taglist")[0];
+
+        tag.className = "tag";
+        tag.innerText = _tag;
+        taglist.append(tag);
+        filters[_tag] = true;
+    }    
+
+    return filters;
+}
+
+
+function _makeEntryWrapper(entry){
+    let wrapper = document.createElement("div"),
+        title = document.createElement("div"),
+        heading_wrapper = document.createElement("div"),
+        heading = document.createElement("h2"),
+        date = document.createElement("div"),
+        taglist = document.createElement("span");
+
+    wrapper.className = "content-wrapper";
+    title.className = "title";
+    heading_wrapper.className = "heading-wrapper";
+    heading.className = "heading";
+    date.className = "date";
+    taglist.className = "taglist";
+
+    heading.innerText = entry.title;
+    date.innerText = _parseDateString(
+        entry.date
+    ).toDateString();
+
+    heading_wrapper.append(heading);
+    heading_wrapper.append(taglist);
+    title.append(date);
+    title.append(heading_wrapper);
+    wrapper.append(title);    
+
+    return wrapper;
+}
+
+
 function _bindDocument(url, endpoint, entry_wrapper){
     button = document.createElement("button");
     button.innerText = "open in new page";
@@ -139,9 +158,9 @@ function _bindDocument(url, endpoint, entry_wrapper){
         }
     }).then(
         (doc) => {
-            let content = doc.getElementById("content")
-            let title = doc.getElementsByClassName("title")[0];
-            let tags = doc.getElementsByClassName("tags")[0];
+            let content = doc.getElementById("content"),
+                title = doc.getElementsByClassName("title")[0],
+                tags = doc.getElementsByClassName("tags")[0];
 
             content.prepend(button);
             tags.remove();

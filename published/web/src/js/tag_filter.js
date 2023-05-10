@@ -1,5 +1,5 @@
 /*
- * © 2023 Jon Rabe, jonrabe@jonr.net
+ * 2023 Jon Rabe, jonrabe@jonr.net
  */
 
 
@@ -7,6 +7,7 @@
 function makeTagFilter() {
     return {
         tag_buttons: [],
+
         addTagButtons: function (taglist, notelist) {
             for (_tag in taglist) {
                 if (!this.getTagButtonNames().includes(_tag)) {
@@ -22,6 +23,7 @@ function makeTagFilter() {
                 }
             }
         },
+
         getTagButtonNames: function() {
             return this.tag_buttons.map(
                 e => e.name
@@ -35,6 +37,7 @@ function toggleAllTags(tagbuttons, notelist){
     let button = document.getElementById("toggle-all-tags");
     button.onclick = ()=>{
         let state = button.innerText=="all off";
+
         for (tagbutton of tagbuttons){
             if (state){
                 tagbutton.off();
@@ -54,14 +57,15 @@ function toggleAllTags(tagbuttons, notelist){
 
 
 function dateFilter(notelist){
-    let date_start = document.getElementById("date-start");
-    let date_stop = document.getElementById("date-stop");
-    let callback = ()=>{
-        _filter(notelist, {
-            date_start: date_start.valueAsDate,
-            date_stop: date_stop.valueAsDate
-        });
-    };
+    let date_start = document.getElementById("date-start"),
+        date_stop = document.getElementById("date-stop"),
+
+        callback = ()=>{
+            _filter(notelist, {
+                date_start: date_start.valueAsDate,
+                date_stop: date_stop.valueAsDate
+            });
+        };
 
     date_start.onchange = callback;
     date_stop.onchange = callback;
@@ -123,14 +127,17 @@ function _makeTagButton(_tag){
         node: tag,
         name: _tag,
         selected: true,
+
         toggle_select: function(){
             this.selected ?
                 this.off() : this.on();
         },
+
         on: function(){
             this.node.className = "tag";
             this.selected = true;
         },
+
         off: function(){
             this.node.className = "tag-unselected";
             this.selected = false;
