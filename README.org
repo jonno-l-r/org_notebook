@@ -258,12 +258,12 @@ Default view. All note entries are collapsed and all filters cleared:
 [[file:demos/screenshot_1.PNG]]
 
 Filtered index example:
-[[file:demos/screenshot_4.PNG]]
+[[file:demos/screenshot_3.PNG]]
 
 ** Maximised Entries
 [[file:demos/screenshot_5.PNG]]
 
 [[file:demos/screenshot_2.PNG]]
 
-** Mobile
-[[file:demos/screenshot_3.PNG]]
+Mobile:
+[[file:demos/screenshot_4.PNG]]
