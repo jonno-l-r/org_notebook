@@ -5,14 +5,18 @@
 
 
 class Document {
+    const external_path_keywords = [
+        "http://",
+        "https://",
+        "gopher://"
+    ];
+    
     private $path;
     private $document_root;
-    private $path_match_keywords;
     private $document;
 
 
-    public function __construct($path, $document_root, $path_match_keywords){
-        $this->path_match_keywords = $path_match_keywords;
+    public function __construct($path, $document_root){
         $this->path = $path;
         $this->document_root = $document_root;
         $this->document = new DOMDocument();
@@ -38,7 +42,7 @@ class Document {
             if ($tag->hasAttributes()){
                 $path = $tag->attributes[$prop]->value;
 
-                if ($this->_keywordsInPath($path)) {
+                if (!$this->_testPathExternal($path)) {
                     $tag->attributes[$prop]->value = $this->_getRootPath($path);
                 }
 
@@ -49,20 +53,20 @@ class Document {
 
     private function _getRootPath($_path){
         return ""
-            . implode(
-                "/",
-                array_slice(
-                    explode("/", $this->path),
-                    0,
-                    $length = -1
-                )
-            )
-            . "/" . $_path;
+             . implode(
+                 "/",
+                 array_slice(
+                     explode("/", $this->path),
+                     0,
+                     $length = -1
+                 )
+             )
+             . "/" . $_path;
     }
 
 
-    private function _keywordsInPath($path){
-        foreach ($this->path_match_keywords as $key){
+    private function _testPathExternal($path){
+        foreach (self::external_path_keywords as $key){
             $_path = explode($key, $path);
 
             if (count($_path) > 1)

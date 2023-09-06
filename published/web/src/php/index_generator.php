@@ -13,11 +13,11 @@ class _DOMDocument extends DOMDocument {
             func_get_args()
         );
     }
-
-
+    
+    
     function getElementsByClassName($_class){
         $finder = new DomXPath($this);
-
+        
         return $finder->query(
             "//*[contains(@class, '$_class')]"
         );
@@ -51,26 +51,45 @@ class IndexGenerator {
         $this->metadata = $this->config["metadata"];
         $this->path = $this->document_root . $this->config["path"];        
 
-        $exclude_files = array();
-        if (array_key_exists("exclude_files", $this->config)) {
-            $exclude_files = $this->config["exclude_files"];
-        }
-
-        $this->note_files = scandir(
-            $this->path,
-            SCANDIR_SORT_DESCENDING
-        );
-
         $this->note_files = array_filter(
-            $this->note_files,
-            $callback = function($e) use ($exclude_files) {
+            self::_getFilesRecursively($this->path),
+            $callback = function ($e) {
                 $filename = explode(".", $e);
-
-                return (
-                    $filename[count($filename)-1] == self::extension
-                ) && !in_array($e, $exclude_files);
+                
+                return $filename[count($filename)-1] == self::extension;
             }
         );
+    }
+
+
+    public static function _getFilesRecursively($path){
+        $files = [];
+        
+        $find_files = function ($path) use (&$files, &$find_files){
+            $contents = scandir(
+                $path,
+                SCANDIR_SORT_DESCENDING
+            );
+            $contents = is_array($contents) ? $contents : [];
+
+            foreach ($contents as $filename) {
+                $filepath = $path . "/" . $filename;
+                
+                if (is_dir($filepath) && !in_array($filename, [".", ".."])) {
+                    $find_files($filepath);
+                }
+
+                else if (!is_dir($filepath)) {
+                    array_push($files, $filepath);
+                }
+            }
+        };
+
+        $find_files(
+            $path[strlen($path)-1] == "/" ? substr($path, 0, -1) : $path
+        );
+        
+        return $files;
     }
 
 
@@ -79,7 +98,7 @@ class IndexGenerator {
 
         foreach ($this->note_files as $note_file){
             $doc = new _DOMDocument();
-            $doc->loadHTMLFile($this->path . $note_file);
+            $doc->loadHTMLFile($note_file);
 
             // Default metadata
             $note["endpoint"] = $this->config["endpoint_name"];

@@ -217,7 +217,7 @@ Notebooks to render in the frontend can be set in =src/js/launch.js=, which can 
 See the full setup file =setup.org= for more information.
 
 * API
-The addressing scheme is =<server>/published/src/php/main.php/<endpoint>/<command>=
+The addressing scheme is =<server>/published/src/php/main.php/api/<endpoint>/<command>=
 
 Valid commands are
 - buildindex

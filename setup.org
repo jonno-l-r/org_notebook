@@ -1,23 +1,37 @@
-#+title: Notebook Renderer Configuration
+#+title: Notebook Publisher Configuration
 
 To set up the publishing functions and capture template, evaluate all codeblocks in this document (=C-c C-v b= --- /read all executable source blocks carefully before executing to ensure you don't break your existing setup/). The evaluation of non-elisp codeblocks has been disabled. If changes are made to the server, docker or frontend configuration blocks, they will need to be tangled to ./published. Launch tangling with =C-c C-v f=.
 
 To have this file loaded automatically, add =(org-babel-load-file (expand-file-name <path-to-this-file>))= to your =.emacs.el=
 
-* Org capture
+* Org Capture Template
 #+NAME: set-capture-template
-#+BEGIN_SRC elisp :var notes-root=(file-name-directory buffer-file-name)
+#+BEGIN_SRC elisp :var notes-root=(file-name-directory buffer-file-name) :lexical t
   (setq notes-path (expand-file-name
-                    (concat notes-root "org/notebook_a/notebook_a/")))
+                    (concat notes-root "org/notebook_a/")))
 
 
-  ;; Make new note file and add headline to index
+  ;; Hooks
+  (defun make-note-directory-hook () nil)
+  (defun reset-note-directory-hook ()
+    (advice-add 'make-note-directory-hook :override (lambda () nil)))
+
+  (add-hook 'org-capture-before-finalize-hook #'make-note-directory-hook)
+  (add-hook 'org-capture-after-finalize-hook #'reset-note-directory-hook)
+  (add-hook 'org-capture-mode-hook #'org-align-all-tags)
+
+  ;; new note file name, add headline to index
+  ;; and update capture hook function with
+  ;; name of directory to create
   (defun new-note (path)
-    (let* ((name (read-string "name: ")))
-      (expand-file-name (format "%s_%s.org"
-                                (format-time-string "%Y-%m-%d")
-                                name)
-                        path)))
+    (let* ((file-name (format "%s_%s"
+                             (format-time-string "%Y-%m-%d")
+                             (read-string "name: "))))
+      (progn
+        (advice-add 'make-note-directory-hook :override
+                    (lambda () (make-directory (concat path "/" file-name))))
+        (expand-file-name (concat file-name ".org")
+                          (concat path "/" file-name)))))
 
 
   ;; Capture templates
@@ -29,8 +43,6 @@ To have this file loaded automatically, add =(org-babel-load-file (expand-file-n
                     "#+DATE: %U\n"
                     "#+TITLE: %^{Note title}\n %?"))))
 
-  (add-hook 'org-capture-mode-hook #'org-align-all-tags)
-
 
   ;; Bind capture dispatcher to C-x a c
   (global-set-key (kbd "C-x a c") 'org-capture)
@@ -38,6 +50,9 @@ To have this file loaded automatically, add =(org-babel-load-file (expand-file-n
 
   notes-path
 #+END_SRC
+
+#+RESULTS: set-capture-template
+: c:/Users/Jonno/Documents/projects/org_notebook_renderer/org/notebook_a/
 
 * Org Publish
 #+name: org-publish
@@ -175,3 +190,31 @@ Example usage of =cond-export=. The filename returned to the buffer under =#+RES
   })();
 #+end_src
 
+* Org Screenshot
+#+begin_src emacs-lisp :var script=(concat (file-name-directory buffer-file-name) "scripts/screenshot.py") :lexical t
+  (defun org-screenshot ()
+      (interactive)
+    (let ((filepath (concat
+                     (file-name-directory buffer-file-name)
+                     "screenshots/"))
+          (filename (concat
+                    (number-to-string
+                     (truncate (float-time)))
+                    ".png"))
+          (filepath-relative "screenshots/"))
+      (progn
+        (if (not (file-exists-p filepath))
+            (make-directory filepath))
+        (if (eq (shell-command (concat
+                        python-shell-interpreter " "
+                        script " "
+                        filepath filename)) 0)
+            (insert (concat
+                     "[[file:" filepath-relative filename "]]"))))))
+
+  (define-key
+    org-mode-map (kbd "C-c s") 'org-screenshot)
+#+end_src
+
+#+RESULTS:
+: org-screenshot

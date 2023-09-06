@@ -17,7 +17,7 @@
 Here is an example note entry.
 
 #+caption: Example codeblock
-#+begin_src python +n :results file :exports both :var name="../media/sine.png"
+#+begin_src python +n :results file :exports both :var name="sine.png"
   from matplotlib import pyplot as plt
   import numpy as np
 

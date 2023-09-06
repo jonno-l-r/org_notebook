@@ -3,7 +3,7 @@ networks:
     external:
       name: frontend
 services:
-  test:
+  published:
     build:
       context: ./
       dockerfile: "published.Dockerfile"

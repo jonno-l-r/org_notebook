@@ -90,8 +90,7 @@ class Controller {
         if ($config){
             $doc = new Document(
                 $this->request["path"],
-                $this->document_root,
-                $config["media"]
+                $this->document_root
             );
 
             header("HTTP/1.1 200 OK");

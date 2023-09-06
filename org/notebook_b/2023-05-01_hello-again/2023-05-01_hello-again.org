@@ -29,7 +29,7 @@ Here is a table
 And here is some python that plots the tabulated data.
 
 #+caption: Python to plot data in table [[data]]
-#+begin_src python +n :results file :exports both :var name="../media/table.png" :var table=data
+#+begin_src python +n :results file :exports both :var name="table.png" :var table=data
   import matplotlib.pyplot as plt
 
   fig = plt.figure(

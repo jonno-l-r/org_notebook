@@ -1,17 +1,13 @@
 server:
   - endpoint_name: notebook_a
-    path: notebook_a/notebook_a/
-    media:
-      - media/
+    path: notebook_a/
     metadata:
       - classname: title
       - classname: date
       - classname: tags
         group: li
   - endpoint_name: notebook_b
-    path: notebook_b/notebook_b/
-    media:
-      - media/
+    path: notebook_b/
     metadata:
       - classname: title
       - classname: date
