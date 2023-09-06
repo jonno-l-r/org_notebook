@@ -36,14 +36,14 @@ The process to generate a new note entry leverages the org-mode capture interfac
 
 Now fill out the document body   
    #+end_example
-4. Commit the capture buffer contents to file with =C-c C-c=. The document can be retrieved for future editing from =./source/notebook_a/notebook_a/<timestamp>_your-note.org=
-5. When ready to publish, launch the Org publish dispatcher with =M-x org-publish=, then type =Notebook= at the minibuffer prompt and press enter. The HTML output will be generated on =../published/web/notebook_a/notebook_a=
+4. Commit the capture buffer contents to file with =C-c C-c=. The document can be retrieved for future editing from =./source/notebook_a/<timestamp>_your-note/<timestamp>_your-note.org=
+5. When ready to publish, launch the Org publish dispatcher with =M-x org-publish=, then type =Notebook= at the minibuffer prompt and press enter. The HTML output will be generated on =../published/web/notebook_a=
 6. Copy the =./published= directory to your webserver
 7. Access the published notebook from =<your-webserver>/published/web/index.html=
 
 Note that
 - The org-mode publishing backend is used to to generate HTML from the source documents in =./org=
-- All media referenced in the document markup must be kept in =../notebook_a/media=
+- All media referenced in the document markup must be somewhere in the repository
 - The server backend expects tags to be present by default. This can be changed in the configuration
 - Configuration for the org-mode capture interface, org-mode publishing backend, server backend and webpage frontend should be modified from =setup.org= (see the following sections). After modifications have been made, tangle the file (=C-c C-v t=)  and push =./published= to your webserver for any changes to take effect.
 - The instructions given above refer to the default notebook =notebook_a=. This can be changed in the configuration as explained below.
@@ -51,42 +51,32 @@ Note that
 * Setup and configuration
 The notebook repository is structured as outlined below. All note entries and attached media are held under =org=.
 #+begin_src plantuml :file demos/orgtree.png :exports results
-  @startditaa
-  root
-  |
-  +---org
-  |   |
-  |   +---shared
-  |   |   |
-  |   |   +---org
-  |   |   |   |
-  |   |   |   +---template.org
-  |   |   |
-  |   |   +---css
-  |   |       |
-  |   |       +---note.css
-  |   |
-  |   +---notebook_1
-  |   |   |
-  |   |   +---notebook_1
-  |   |   |   |
-  |   |   |   +---timestamp_notename.org
-  |   |   |   |
-  |   |   |   v
-  |   |   |               
-  |   |   +---media
-  |   |       |
-  |   |       +---mediafile.png
-  |   |       |
-  |   |       v
-  |   |                     
-  |   +---notebook_2
-  |   |   |
-  |   |   v
-  |   v
-  |
-  +---published
-  @endditaa
+  @startuml
+  salt
+  {
+  {T
+  + org_notebook
+  ++ org
+  +++ shared
+  ++++ org
+  +++++ template.org
+  ++++ css
+  +++++ note.css
+  +++ notebook_a
+  ++++ <timestamp>_<note name>
+  +++++ <timestamp>_<note name>.org
+  +++++ image.png
+  +++++ ...
+  +++++ screenshots
+  ++++++ <timestamp>.png
+  +++ notebook_b
+  ++++ <timestamp>_<notename>
+  +++++ <timestamp>_<notename>.org
+  +++++ etc.
+  ++ published
+  }
+  }
+      @enduml
 #+end_src
 
 #+RESULTS:
@@ -94,63 +84,38 @@ The notebook repository is structured as outlined below. All note entries and at
 
 Published HTML is exported to =published/web=. The published directory also holds the source files for the API and web frontend.
 #+begin_src plantuml :file demos/publishedtree.png :exports results
-  @startditaa
-  root
-  |
-  +---org
-  |   |
-  |   v
-  |
-  +---published
-      |
-      +---compose.yml
-      +---published.dockerfile
-      |
-      +---web
-          |
-          +---index.html
-          +---src
-          |   |
-          |   +---js
-          |   |   |
-          |   |   +---launch.js
-          |   |   |
-          |   |   v
-          |   |
-          |   +---php
-          |   |   |
-          |   |   +---main.php
-          |   |   |
-          |   |   v
-          |   |
-          |   +---css
-          |   |   |
-          |   |   v
-          |   |
-          |   +---conf
-          |       |
-          |       +---config.yml
-          |
-          +---shared
-          |   |
-          |   v
-          |
-          +---notebook_1
-          |   |
-          |   v
-          |
-          +---notebook_2
-          |   |
-          |   v
-          v
-  @endditaa
+  @startuml
+  salt
+  {
+  {T
+  + org_notebook
+  ++ org
+  +++ ...
+  ++ published
+  +++ compose.yml
+  +++ published.dockerfile
+  +++ web
+  ++++ index.html
+  ++++ src
+  +++++ js
+  +++++ php
+  +++++ css
+  +++++ conf
+  +++++ shared
+  +++++ notebook_a
+  ++++++ ...published html...
+  +++++ notebook_b
+  ++++++ ...published html...
+  }
+  }
+  @enduml
 #+end_src
 
 #+RESULTS:
 [[file:demos/publishedtree.png]]
 
 ** Org-mode
-To change the notebook used in the capture template, modify the =notes-path= variable in the =set-capture-template= codeblock. Notebook entries must be filed to =./<notebook-name/<notebook-name>=. These directories should be present in the filesystem before using the org-capture dispatcher for the first time.
+To change the notebook used in the capture template, modify the =notes-path= variable in the =set-capture-template= codeblock. Notebook entries must be filed under =./<notebook-name>=. Note files can be nested in arbitrary subdirectories under this notebook directory. By default, the capture template will nest a new note entry under a subdirectory of the same name.  The notebook directory should be present in the filesystem before using the org-capture dispatcher for the first time.
 
 To change the notebook to be published, edit the =org-publish-project-alist= defined in the =org-publish= codeblock. Edit the =base-directory= and =publishing-directory= properties. Multiple notebooks can be published by adding new  =notebook= and =notebook-static= lists (but under different names) to =org-publish-project-alist=. Note that additional notebooks will need to be added to the =:components= property (or broken out into a new =:components= property under a different name), i.e.
 
@@ -186,9 +151,7 @@ The server configuration can be set through a yaml configuration file (see the =
 #+begin_src yaml :eval never
   server:
     - endpoint_name: notebook_a
-      path: notebook_a/notebook_a/
-      media:
-        - media/
+      path: notebook_a/
       metadata:
         - classname: title
         - classname: date
@@ -251,7 +214,7 @@ Builds a summary of the note entries on the current endpoint. The format is
 
 The inner-text value of the classes specified under the =metadata= key in the backend configuration will be included in the summary. 
 ** fetch
-Fetches the note entry file on the URL supplied to =path=, =<endpoint>/fetch/?path=<url>=, where the URL is given relative to =index.html=. Any links to directories specified under the =media= key in the backend configuration will be modified such that they are relative to =index.html= in the delivered HTML.
+Fetches the note entry file on the URL supplied to =path=, =<endpoint>/fetch/?path=<url>=, where the URL is given relative to =index.html=. Any non-remote links will be modified such that they are relative to =index.html= in the delivered HTML.
 * Screenshots
 ** Collapsed Entries
 Default view. All note entries are collapsed and all filters cleared:
