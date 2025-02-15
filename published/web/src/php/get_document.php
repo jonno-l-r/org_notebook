@@ -25,14 +25,18 @@ class Document {
 
     public function getDocument(){
         $this->document->loadHTMLFile(
-            $this->document_root . "/" . $this->path
+            $this->document_root . "/" . $this->path,
+            
+            // This option ensures HTML tags
+            // will not be removed
+            $options = LIBXML_SCHEMA_CREATE
         );
 
         $this->_adjustNodePaths("a", "href");
         $this->_adjustNodePaths("img", "src");
 
         return $this->document->saveHTML();
-    }    
+    }
 
 
     private function _adjustNodePaths($tag, $prop){
