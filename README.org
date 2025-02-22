@@ -48,9 +48,8 @@ Ensure all media referenced by the document is filed somewhere under the parent 
 * Gallery
 The documents under =./examples= produce the following output when published
 
-*Desktop*
+- *Desktop*
 [[file:media/example_desktop.PNG]]
 
-
-*Mobile*
+- *Mobile*
 [[file:media/example_mobile.PNG]]
