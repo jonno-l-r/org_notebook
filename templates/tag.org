@@ -1,0 +1,3 @@
+<span class=TagButtonWrapper data-tag-id={{tag}}>
+    <span class=TagButtonSelected>{{tag}}</span>
+</span>

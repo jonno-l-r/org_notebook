@@ -1,0 +1,8 @@
+{{html}}
+<div class=EntryContainer>
+    <div class=HeadingContainer> {{/html}}
+        [{{timestamp}}] {{html}} <span class=EntryHeading>{{/html}} [[file:{{link}}][{{name}}]] {{html}}</span>
+        <div class=TagContainer> {{tags}} </div>
+    </div>
+</div>
+{{/html}}

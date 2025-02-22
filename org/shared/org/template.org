@@ -1,9 +1,0 @@
-#+html_head: <link rel="stylesheet" type="text/css" href="../../shared/css/article.css"/>
-#+options: h:4 num:t toc:t
-#+author: your name
-#+email: you@youremail.com
-
-#+begin_src emacs-lisp :results list :wrap tags :exports results
-  org-file-tags
-#+end_src
-

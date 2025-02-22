@@ -1,0 +1,90 @@
+#+html_head: <link rel="stylesheet" type="text/css" href="static/style.css">
+#+html_head_extra: <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+#+html_head_extra: <script type="text/javascript" src="static/config.js" defer></script>
+#+html_head_extra: <script type="text/javascript" src="static/entry_onclick.js" defer></script>
+#+html_head_extra: <script type="text/javascript" src="static/build.js" defer></script>
+#+html_head_extra: <script type="text/javascript" src="static/filter.js" defer></script>
+#+html_head_extra: <script type="text/javascript" src="static/mathjax.js" defer></script>
+
+#+options: html-postamble:nil
+
+#+TITLE: Project Journal
+
+#+begin_export HTML
+<div id=control_panel_wrapper>
+    <form id=control_panel>
+        <div class=ControlWidget>
+            <span class=ControlLabel>tags</span>
+            <div id=tag_widget>
+            </div>
+        </div>
+        <div class="ControlWidget">
+            <span class="ControlLabel">filter mode</span>
+            <div id=filter_mode>
+                <input type=radio name=filter value=intersection checked=checked>
+                <label>Intersection</label><br>
+                <input type=radio name=filter value=subset>
+                <label>Subset</label><br>
+                <input type=radio name=filter value=superset>
+                <label>Superset</label>
+            </div>
+        </div>
+        <div class="ControlWidget">
+            <span class=ControlLabel>date range</span>
+            <div id=date_widget>
+                <label for=start_date>Start</label>
+                <input type=date name=start_date id=start_date><br><br>
+                <label for=stop_date>Stop</label>
+                <input type=date name=stop_date id=stop_date>
+            </div>
+        </div>
+        <center>
+            <input type=submit name=action value=Reset>
+            <input type=submit name=action value=Invert>
+        </center>
+    </form>
+</div>
+#+end_export
+
+@@html: <div id="main_window">@@
+@@html:
+<div class=EntryContainer>
+    <div class=HeadingContainer> @@
+        [2025-02-22 Sat]  @@html: <span class=EntryHeading>@@ [[file:example_2/example_2.org][Example Notebook Entry: Foo Bar]] @@html:</span>
+        <div class=TagContainer> <span class=TagButtonWrapper data-tag-id=example>
+    <span class=TagButtonSelected>example</span>
+</span>
+ <span class=TagButtonWrapper data-tag-id=test>
+    <span class=TagButtonSelected>test</span>
+</span>
+ <span class=TagButtonWrapper data-tag-id=foo>
+    <span class=TagButtonSelected>foo</span>
+</span>
+ <span class=TagButtonWrapper data-tag-id=bar>
+    <span class=TagButtonSelected>bar</span>
+</span>
+ </div>
+    </div>
+</div>
+@@
+@@html:
+<div class=EntryContainer>
+    <div class=HeadingContainer> @@
+        [2025-02-17 Mon]  @@html: <span class=EntryHeading>@@ [[file:example_1.org][Example Notebook Entry]] @@html:</span>
+        <div class=TagContainer> <span class=TagButtonWrapper data-tag-id=example>
+    <span class=TagButtonSelected>example</span>
+</span>
+ <span class=TagButtonWrapper data-tag-id=test>
+    <span class=TagButtonSelected>test</span>
+</span>
+ <span class=TagButtonWrapper data-tag-id=lorem>
+    <span class=TagButtonSelected>lorem</span>
+</span>
+ <span class=TagButtonWrapper data-tag-id=ipsum>
+    <span class=TagButtonSelected>ipsum</span>
+</span>
+ </div>
+    </div>
+</div>
+@@
+@@html: </div> @@

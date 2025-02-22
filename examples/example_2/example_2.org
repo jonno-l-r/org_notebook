@@ -1,0 +1,23 @@
+#+title: Example Notebook Entry: Foo Bar
+#+filetags: :example:test:foo:bar:
+
+* Foo Bar
+Here is a sine wave;
+
+#+begin_src python :results output file :file sine.png :dir media :eval never
+  from matplotlib import pyplot as plt
+  import numpy as np
+  import sys
+
+  x = np.linspace(-1, 1, 100)
+
+  fig = plt.figure(figsize = (6, 4))
+  plt.plot(x, np.sin(2*np.pi*x))
+  plt.grid()
+
+  plt.savefig(sys.stdout.buffer, transparent=True)
+#+end_src
+
+
+#+caption: The sinewave
+[[file:media/sine.png]]

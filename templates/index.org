@@ -1,0 +1,51 @@
+#+html_head: <link rel="stylesheet" type="text/css" href="static/style.css">
+#+html_head_extra: <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+#+html_head_extra: <script type="text/javascript" src="static/config.js" defer></script>
+#+html_head_extra: <script type="text/javascript" src="static/entry_onclick.js" defer></script>
+#+html_head_extra: <script type="text/javascript" src="static/build.js" defer></script>
+#+html_head_extra: <script type="text/javascript" src="static/filter.js" defer></script>
+#+html_head_extra: <script type="text/javascript" src="static/mathjax.js" defer></script>
+
+#+options: html-postamble:nil
+
+#+TITLE: {{index-title}}
+
+#+begin_export HTML
+<div id=control_panel_wrapper>
+    <form id=control_panel>
+        <div class=ControlWidget>
+            <span class=ControlLabel>tags</span>
+            <div id=tag_widget>
+            </div>
+        </div>
+        <div class="ControlWidget">
+            <span class="ControlLabel">filter mode</span>
+            <div id=filter_mode>
+                <input type=radio name=filter value=intersection checked=checked>
+                <label>Intersection</label><br>
+                <input type=radio name=filter value=subset>
+                <label>Subset</label><br>
+                <input type=radio name=filter value=superset>
+                <label>Superset</label>
+            </div>
+        </div>
+        <div class="ControlWidget">
+            <span class=ControlLabel>date range</span>
+            <div id=date_widget>
+                <label for=start_date>Start</label>
+                <input type=date name=start_date id=start_date><br><br>
+                <label for=stop_date>Stop</label>
+                <input type=date name=stop_date id=stop_date>
+            </div>
+        </div>
+        <center>
+            <input type=submit name=action value=Reset>
+            <input type=submit name=action value=Invert>
+        </center>
+    </form>
+</div>
+#+end_export
+
+@@html: <div id="main_window">@@
+{{index-content}}
+@@html: </div> @@
