@@ -51,5 +51,6 @@ The documents under =./examples= produce the following output when published
 *Desktop*
 [[file:media/example_desktop.PNG]]
 
+
 *Mobile*
 [[file:media/example_mobile.PNG]]
