@@ -49,7 +49,7 @@ Ensure all media referenced by the document is filed somewhere under the parent 
 The documents under =./examples= produce the following output when published
 
 *Desktop*
-[[file:media/example_desktop.png]]
+[[file:media/example_desktop.PNG]]
 
 *Mobile*
-[[file:media/example_mobile.png]]
+[[file:media/example_mobile.PNG]]
